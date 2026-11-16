@@ -1,0 +1,10 @@
+{
+  "name": "super-mario-html5",
+  "version": "1.0.0",
+  "description": "A Super Mario-style platformer in pure vanilla JS + Canvas + WebAudio",
+  "scripts": {
+    "test": "node test/smoke.js && node test/mechanics.js && node test/endgame.js",
+    "start": "npx serve ."
+  },
+  "license": "MIT"
+}

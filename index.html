@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Mario — HTML5 Edition</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23f8b800'/></svg>">
+</head>
+<body>
+  <div id="wrap">
+    <h1>🍄 SUPER MARIO <span>HTML5 EDITION</span></h1>
+    <div id="frame">
+      <canvas id="game" width="512" height="320"></canvas>
+      <div id="touch" aria-hidden="true">
+        <button data-k="left">◀</button>
+        <button data-k="down">▼</button>
+        <button data-k="right">▶</button>
+        <button data-k="run">B</button>
+        <button data-k="jump">A</button>
+      </div>
+    </div>
+    <p id="help">
+      <b>←→/AD</b> move &nbsp; <b>Z/Space</b> jump &nbsp; <b>X/Shift</b> run+fireball
+      &nbsp; <b>↓/S</b> crouch &nbsp; <b>P</b> pause &nbsp; <b>M</b> mute &nbsp; <b>R</b> restart
+    </p>
+  </div>
+  <script src="levels.js"></script>
+  <script src="audio.js"></script>
+  <script src="entities.player.js"></script>
+  <script src="entities.world.js"></script>
+  <script src="renderer.js"></script>
+  <script src="game.js"></script>
+  <script>
+    // touch controls (mobile)
+    document.querySelectorAll('#touch button').forEach(btn => {
+      const k = btn.dataset.k;
+      const set = v => e => { e.preventDefault(); window.dispatchEvent(new KeyboardEvent(v ? 'keydown' : 'keyup', { key: k === 'jump' ? 'z' : k === 'run' ? 'x' : k === 'left' ? 'ArrowLeft' : k === 'right' ? 'ArrowRight' : 'ArrowDown' })); };
+      btn.addEventListener('touchstart', set(true));
+      btn.addEventListener('touchend', set(false));
+      btn.addEventListener('mousedown', set(true));
+      btn.addEventListener('mouseup', set(false));
+    });
+  </script>
+</body>
+</html>
