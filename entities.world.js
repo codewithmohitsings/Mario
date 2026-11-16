@@ -16,6 +16,7 @@ class Enemy {
     this.shellTimer = 0;
     this.anim = 0;
     this.activated = false;
+    this.mpId = game.mp ? game.mp.enemyId++ : 0;   // stable id for netcode
   }
   activate() { if (!this.activated) this.activated = true; }
 
@@ -36,7 +37,7 @@ class Enemy {
       this.vy = 0;
     }
     this.game.audio.stomp();
-    this.game.addScore(100);
+    if (this.game.mp.mode === 'off') this.game.addScore(100);
     this.game.addFloater(this.x + this.w / 2, this.y, '100');
   }
 
@@ -47,7 +48,7 @@ class Enemy {
     this.vy = -5;
     this.vx = 0;
     this.game.audio.kick();
-    this.game.addScore(200);
+    if (this.game.mp.mode === 'off') this.game.addScore(200);
     this.game.addFloater(this.x + this.w / 2, this.y, '200');
   }
 

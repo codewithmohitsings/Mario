@@ -12,6 +12,77 @@
     <h1>🍄 SUPER MARIO <span>HTML5 EDITION</span></h1>
     <div id="frame">
       <canvas id="game" width="512" height="320"></canvas>
+
+      <!-- menu / lobby overlays -->
+      <div id="overlayUI">
+        <!-- main menu -->
+        <div class="screen" data-screen="menu">
+          <div class="panel">
+            <h2>Choose game mode</h2>
+            <button id="btnSolo" class="primary">▶ SOLO PLAY</button>
+            <button id="btnHost">👑 HOST RACE (up to 3 players)</button>
+            <button id="btnJoin">🔗 JOIN A RACE</button>
+          </div>
+        </div>
+
+        <!-- host: create room -->
+        <div class="screen" data-screen="host">
+          <div class="panel">
+            <h2>Host a race</h2>
+            <label>Your name</label>
+            <input id="hostName" maxlength="10" placeholder="MARIO">
+            <button id="btnCreate" class="primary">CREATE ROOM</button>
+            <button id="btnBackHost" class="link">← back</button>
+          </div>
+        </div>
+
+        <!-- host: lobby -->
+        <div class="screen" data-screen="hostLobby">
+          <div class="panel wide">
+            <h2>Lobby</h2>
+            <div class="code-box">ROOM CODE: <b id="roomCode">·····</b></div>
+            <p class="hint">Friends open this same site and enter the code.<br>Link: <span id="hostLink"></span></p>
+            <div id="playerList" class="player-list"></div>
+            <label>Levels in this race (order is fixed)</label>
+            <div id="lvlPicker" class="lvl-grid"></div>
+            <div class="preset-row">
+              <span>quick:</span>
+              <button data-n="1">1</button>
+              <button data-n="3">3</button>
+              <button data-n="5">5</button>
+              <button data-n="10">All</button>
+            </div>
+            <button id="btnStart" class="primary">🏁 START RACE</button>
+            <button id="btnLeave" class="link">leave</button>
+          </div>
+        </div>
+
+        <!-- join -->
+        <div class="screen" data-screen="join">
+          <div class="panel">
+            <h2>Join a race</h2>
+            <label>Your name</label>
+            <input id="joinName" maxlength="10" placeholder="LUIGI">
+            <label>Room code</label>
+            <input id="joinCode" maxlength="5" placeholder="ABC12" style="text-transform:uppercase">
+            <p id="joinErr" class="hint"></p>
+            <button id="btnJoinGo" class="primary">JOIN</button>
+            <button id="btnBackJoin" class="link">← back</button>
+          </div>
+        </div>
+
+        <!-- join: lobby -->
+        <div class="screen" data-screen="joinLobby">
+          <div class="panel wide">
+            <h2>Lobby</h2>
+            <div class="code-box">ROOM: <b id="joinCodeShow"></b></div>
+            <p class="hint">Waiting for the host to start…</p>
+            <div id="playerListJoin" class="player-list"></div>
+            <button id="btnLeaveJoin" class="link">leave</button>
+          </div>
+        </div>
+      </div>
+
       <div id="touch" aria-hidden="true">
         <button data-k="left">◀</button>
         <button data-k="down">▼</button>
@@ -25,8 +96,11 @@
       &nbsp; <b>↓/S</b> crouch &nbsp; <b>P</b> pause &nbsp; <b>M</b> mute &nbsp; <b>R</b> restart
     </p>
   </div>
+  <script src="vendor/trystero.js"></script>
   <script src="levels.js"></script>
+  <script src="levels2.js"></script>
   <script src="audio.js"></script>
+  <script src="net.js"></script>
   <script src="entities.player.js"></script>
   <script src="entities.world.js"></script>
   <script src="renderer.js"></script>

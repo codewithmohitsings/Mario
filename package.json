@@ -1,10 +1,15 @@
 {
   "name": "super-mario-html5",
-  "version": "1.0.0",
-  "description": "A Super Mario-style platformer in pure vanilla JS + Canvas + WebAudio",
+  "version": "2.0.0",
+  "description": "A Super Mario-style platformer in pure vanilla JS + Canvas + WebAudio, with 3-player P2P race mode",
   "scripts": {
-    "test": "node test/smoke.js && node test/mechanics.js && node test/endgame.js",
-    "start": "npx serve ."
+    "test": "node test/smoke.js && node test/mechanics.js && node test/endgame.js && node test/multiplayer.js",
+    "start": "python3 -m http.server 8000 --bind 127.0.0.1",
+    "build": "esbuild node_modules/trystero/dist/index.mjs --bundle --minify --format=iife --global-name=Trystero --outfile=vendor/trystero.js --platform=browser"
+  },
+  "devDependencies": {
+    "trystero": "^0.27.0",
+    "esbuild": "^0.28.2"
   },
   "license": "MIT"
 }

@@ -54,6 +54,7 @@ class AudioSys {
   powerdown()  { const n = [784, 659, 523]; n.forEach((f, i) => this.tone(f, 0.1, 'square', 0.12, i * 0.07)); }
   die()        { this.stopMusic(); const n = [523, 392, 330, 262, 196]; n.forEach((f, i) => this.tone(f, 0.16, 'square', 0.14, i * 0.12)); }
   kick()       { this.tone(400, 0.08, 'square', 0.15, 0, -200); }
+  checkpoint() { this.tone(660, 0.08, 'square', 0.13); this.tone(880, 0.14, 'square', 0.13, 0.08); }
   fireball()   { this.tone(600, 0.1, 'sawtooth', 0.1, 0, -300); }
   flag()       { const n = [262, 330, 392, 523, 659, 784]; n.forEach((f, i) => this.tone(f, 0.12, 'square', 0.12, i * 0.09)); }
   lifeUp()     { const n = [523, 659, 784, 1047, 784, 1047]; n.forEach((f, i) => this.tone(f, 0.11, 'square', 0.13, i * 0.08)); }

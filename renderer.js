@@ -137,8 +137,23 @@ class Renderer {
     }
   }
 
-  flag(x, baseY, raise) {
+  // mid-level checkpoint flag: red until any racer passes, then green
+  checkpoint(x, baseY, active) {
     const c = this.ctx;
+    c.fillStyle = '#909090';
+    c.fillRect(x + 10, baseY - 48, 3, 48);
+    c.fillStyle = '#606060';
+    c.fillRect(x + 8, baseY - 52, 7, 5);
+    const fy = active ? baseY - 44 : baseY - 30;
+    c.fillStyle = active ? '#00c000' : '#f83800';
+    c.beginPath();
+    c.moveTo(x + 13, fy);
+    c.lineTo(x + 30, fy + 7);
+    c.lineTo(x + 13, fy + 14);
+    c.closePath(); c.fill();
+  }
+
+  flag(x, baseY, raise) {    const c = this.ctx;
     // pole
     c.fillStyle = '#00e000';
     c.fillRect(x + 10, baseY - 160, 3, 160);

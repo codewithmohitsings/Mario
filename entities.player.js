@@ -5,6 +5,8 @@ function overlap(a, b) {
 }
 
 // ============ PLAYER ============
+// One Player instance per racer. `game.sfx()` routes sounds so clients don't
+// double-play predicted actions (host broadcasts sound events instead).
 class Player {
   constructor(game, x, y) {
     this.game = game;
@@ -22,6 +24,9 @@ class Player {
     this.anim = 0;
     this.growTimer = 0;          // pause while growing/shrinking
     this.shifting = 0;           // 0 none, 1 growing, -1 shrinking
+    this.ci = 0;                 // color palette index (multiplayer)
+    this.local = true;           // false = simulated remote player on host
+    this.wasStar = 0;
   }
 
   get big() { return this.power > 0; }
@@ -34,7 +39,7 @@ class Player {
       this.growTimer = 40;
       this.invuln = 120;
       this.h = 28; this.y += 14;
-      this.game.audio.powerdown();
+      this.game.sfx('powerdown');
     } else {
       this.die();
     }
@@ -44,8 +49,8 @@ class Player {
     if (this.dead) return;
     this.dead = true;
     this.vy = -11; this.vx = 0;
-    this.game.audio.die();
-    this.game.onPlayerDeath();
+    this.game.sfx('die');
+    this.game.onPlayerDeath(this);
   }
 
   update(input) {
@@ -81,7 +86,7 @@ class Player {
     if (input.jump && this.onGround && !this.jumpHeld) {
       this.vy = -(8.1 + Math.abs(this.vx) * 0.2);
       this.onGround = false;
-      this.game.audio.jump(this.big);
+      this.game.sfx('jump', this.big);
     }
     this.jumpHeld = input.jump;
     // variable jump height
@@ -89,19 +94,21 @@ class Player {
 
     // fireball
     if (this.fireCooldown > 0) this.fireCooldown--;
-    if (input.fire && this.power === 2 && this.fireCooldown === 0 && this.game.fireballs.length < 2) {
+    if (input.fire && this.power === 2 && this.fireCooldown === 0 && this.game.fireballs.length < 4) {
       const fb = new Fireball(this.game, this.x + (this.facing > 0 ? this.w : -8), this.y + 8, this.facing);
       this.game.fireballs.push(fb);
       this.fireCooldown = 22;
-      this.game.audio.fireball();
+      this.game.sfx('fireball');
     }
-    this.game.input.fire = false; // consume
+    input.fire = false; // consume per-player
 
     if (this.invuln > 0) this.invuln--;
     if (this.starTime > 0) {
+      if (this.wasStar === 0 && !this.game.isClient) this.game.audio.stopMusic();
       this.starTime--;
-      if (this.starTime === 0) this.game.audio.startMusic(this.game.level.track || 'overworld');
+      if (this.starTime === 0) this.game.music(this.game.level.track || 'overworld');
     }
+    this.wasStar = this.starTime;
 
     // physics
     this.vy = Math.min(this.vy + GRAV, MAX_FALL);
@@ -118,8 +125,9 @@ class Player {
     this.x += dx;
     const g = this.game;
     if (this.x < 0) { this.x = 0; this.vx = 0; }
-    // can't walk back past the camera edge (classic SMB rule)
-    if (this.x < g.cameraX) { this.x = g.cameraX; this.vx = 0; }
+    // local player can't walk back past the camera edge (classic SMB rule);
+    // remote players are free since they have their own camera on their device
+    if (this.local && this.x < g.cameraX) { this.x = g.cameraX; this.vx = 0; }
     const maxX = g.levelWidth - this.w;
     if (this.x > maxX) { this.x = maxX; this.vx = 0; }
     // tile collisions (horizontal)
@@ -173,23 +181,36 @@ class Player {
         this.y -= 14; this.h = 42;
         this.shifting = 1; this.growTimer = 30;
       }
-      this.game.addScore(1000);
-      this.game.audio.powerup();
+      this.game.addScore(1000, this);
+      this.game.sfx('powerup');
     } else if (kind === 'flower') {
       if (this.power === 0) { this.y -= 14; this.h = 42; }
       this.power = 2;
       this.shifting = 1; this.growTimer = 30;
-      this.game.addScore(1000);
-      this.game.audio.powerup();
+      this.game.addScore(1000, this);
+      this.game.sfx('powerup');
     } else if (kind === 'star') {
       this.starTime = 600;
-      this.game.addScore(1000);
-      this.game.audio.stopMusic();
-      this.game.audio.powerup();
+      this.game.addScore(1000, this);
+      this.game.sfx('powerup');
     } else if (kind === '1up') {
-      this.game.lives++;
-      this.game.audio.lifeUp();
+      this.game.addLife(this);
+      this.game.sfx('lifeUp');
     }
+  }
+
+  reset(x, y) {
+    this.x = x; this.y = y;
+    this.vx = 0; this.vy = 0;
+    this.power = 0; this.h = 28;
+    this.dead = false;
+    this.invuln = 120;
+    this.starTime = 0; this.wasStar = 0;
+    this.shifting = 0; this.growTimer = 0;
+    this.fireCooldown = 0;
+    this.crouch = false;
+    this.onGround = false;
+    this.facing = 1;
   }
 }
 window.Player = Player;
